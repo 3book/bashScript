@@ -2,10 +2,10 @@
 scriptpath=$(cd $(dirname $0); pwd)
 scriptname=$(basename $0)
 i_file=$1
-i_file_path=$(cd $(dirname $1); pwd)
-i_file_name=$(basename $1)
+i_file_path=$(cd "$(dirname "${i_file}")"; pwd)
+i_file_name=$(basename "$i_file")
 #file ext name test
-if [[ $i_file =~ .v ]];then
+if [[ "$i_file" =~ .v ]];then
 	o_file=${i_file_path}"/"${i_file_name%.v}"_inst.v"
 else
 	echo "Usage: sh $scriptname *.v"
@@ -14,9 +14,8 @@ fi
 
 tmp1=$(mktemp)
 tmp2=$(mktemp)
-cat $i_file >$tmp1
-echo "" >$o_file
-
+cat "$i_file" >$tmp1
+echo "" >"$o_file"
 swap_name() {
 #	sleep 1
 	t=$(mktemp) 
@@ -65,18 +64,18 @@ longest_io=$(cat $tmp1 \
 
 #out
 if [[ $parameter_exist -eq 0 ]];then
-	echo "${module_name} ${module_name}_inst(" >>$o_file
+	echo "${module_name} ${module_name}_inst(" >>"$o_file"
 else
-	echo "${module_name} #(" >>$o_file
+	echo "${module_name} #(" >>"$o_file"
 	cat $tmp1|awk -v len=$longest_io ' \
-		/parameter/ {printf ".%-"'len'"s\t(%-"'len'"s\t),\n",$2,$2}' >>$o_file
+		/parameter/ {printf ".%-"'len'"s\t(%-"'len'"s\t),\n",$2,$2}' >>"$o_file"
 	sed -i '$s/,$//' $o_file
-	echo ")${module_name}_inst(" >> $o_file
+	echo ")${module_name}_inst(" >> "$o_file"
 fi
 cat $tmp1|awk -v len=$longest_io ' \
-	/input|output/ {printf ".%-"'len'"s\t(%-"'len'"s\t),\n",$2,$2}' >>$o_file
-	sed -i '$s/,$//' $o_file
-	sed -i '$a);' $o_file
+	/input|output/ {printf ".%-"'len'"s\t(%-"'len'"s\t),\n",$2,$2}' >>"$o_file"
+	sed -i '$s/,$//' "$o_file"
+	sed -i '$a);' "$o_file"
 	
 echo "outfile:$o_file"
 exit 0
