@@ -1,5 +1,5 @@
 #!/bin/bash
-sh_dir='/mnt/d/xyp/develop/shell/'
+sh_dir='./common/'
 . ${sh_dir}config.sh
 . ${sh_dir}common.sh
 scriptpath=$(cd $(dirname $0); pwd)

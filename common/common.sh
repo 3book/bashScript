@@ -1,5 +1,4 @@
 #!/bin/sh
-#sh_dir='/mnt/d/xyp/develop/shell/'
 gtemp() {
     temp_dir=$(mktemp -d)
     cd $temp_dir
