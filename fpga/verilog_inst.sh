@@ -2,11 +2,12 @@
 scriptpath=$(cd $(dirname $0); pwd)
 scriptname=$(basename $0)
 i_file=$1
-i_file_path=$(cd "$(dirname "${i_file}")"; pwd)
-i_file_name=$(basename "$i_file")
+#i_file_path=$(cd "$(dirname "${i_file}")"; pwd)
+#i_file_name=$(basename "$i_file")
 #file ext name test
 if [[ "$i_file" =~ .v ]];then
-	o_file=${i_file_path}"/"${i_file_name%.v}"_inst.v"
+#	o_file=${i_file_path}"/"${i_file_name%.v}"_inst.v"
+	:
 else
 	echo "Usage: sh $scriptname *.v"
 	exit 1
@@ -15,7 +16,7 @@ fi
 tmp1=$(mktemp)
 tmp2=$(mktemp)
 cat "$i_file" >$tmp1
-echo "" >"$o_file"
+#echo "" >"$o_file"
 swap_name() {
 #	sleep 1
 	t=$(mktemp) 
@@ -47,7 +48,8 @@ cat $tmp1|sed 's/\[.*\]//' \
 cat $tmp1|sed 's/\>[wire|reg]\>//' \
 	> $tmp2 ;swap_name $tmp1 $tmp2
 #delete ;|,
-cat $tmp1|sed 's/[,|;]//' \
+#cat $tmp1|sed 's/[,|;]//' \
+cat $tmp1|sed 's/\W/ /g' \
 	> $tmp2 ;swap_name $tmp1 $tmp2
 
 #get module_name
@@ -63,19 +65,21 @@ longest_io=$(cat $tmp1 \
 	|wc -L )
 
 #out
+echo '' >$tmp2
 if [[ $parameter_exist -eq 0 ]];then
-	echo "${module_name} ${module_name}_inst(" >>"$o_file"
+	echo "${module_name} ${module_name}_inst(" >>"$tmp2"
 else
-	echo "${module_name} #(" >>"$o_file"
+	echo "${module_name} #(" >>"$tmp2"
 	cat $tmp1|awk -v len=$longest_io ' \
-		/parameter/ {printf ".%-"'len'"s\t(%-"'len'"s\t),\n",$2,$2}' >>"$o_file"
-	sed -i '$s/,$//' $o_file
-	echo ")${module_name}_inst(" >> "$o_file"
+		/parameter/ {printf ".%-"'len'"s\t(%-"'len'"s\t),\n",$2,$2}' >>"$tmp2"
+	sed -i '$s/,$//' "$tmp2"
+	echo ")${module_name}_inst(" >> "$tmp2"
 fi
 cat $tmp1|awk -v len=$longest_io ' \
-	/input|output/ {printf ".%-"'len'"s\t(%-"'len'"s\t),\n",$2,$2}' >>"$o_file"
-	sed -i '$s/,$//' "$o_file"
-	sed -i '$a);' "$o_file"
+	/input|output/ {printf ".%-"'len'"s\t(%-"'len'"s\t),\n",$2,$2}' >>"$tmp2"
+	sed -i '$s/,$//' "$tmp2"
+	sed -i '$a);' "$tmp2"
 	
-echo "outfile:$o_file"
+cat "$tmp2"
+#echo "outfile:$o_file"
 exit 0
