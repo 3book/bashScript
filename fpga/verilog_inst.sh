@@ -45,7 +45,9 @@ cat $tmp1|awk '/\/\*/ {p=1};!p;/\*\//{p=0}' \
 cat $tmp1|sed 's/\[.*\]//' \
 	> $tmp2 ;swap_name $tmp1 $tmp2
 #delete "wire/reg"
-cat $tmp1|sed 's/\>[wire|reg]\>//' \
+cat $tmp1|sed 's/\bwire\b//' \
+	> $tmp2 ;swap_name $tmp1 $tmp2
+cat $tmp1|sed 's/\breg\b//' \
 	> $tmp2 ;swap_name $tmp1 $tmp2
 #delete ;|,
 #cat $tmp1|sed 's/[,|;]//' \
